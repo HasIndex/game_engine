@@ -6,21 +6,24 @@ using UnityEngine;
 
 public enum PlayerState
 {
-    walk, attack, interact
+    walk, attack, interact, pathfinding
 }
 
 public class PlayerMovement : MonoBehaviour
 {
-    // Start is called before the first frame update
-    public PlayerState currentState;
-    public float speed;
-    private Rigidbody2D myRigidbody;
-    private Vector3 change;
-    private Animator animator;
+    public PlayerState      currentState;
+    public float            speed;
+    private Rigidbody2D     myRigidbody;
+    private Vector3         change;
+    private Animator        animator;
     void Start()
     {
-        animator = GetComponent<Animator>();
-        myRigidbody = GetComponent<Rigidbody2D>();
+        currentState    = PlayerState.walk;
+        animator        = GetComponent<Animator>();
+        myRigidbody     = GetComponent<Rigidbody2D>();
+
+        animator.SetFloat("moveX", 0);
+        animator.SetFloat("moveY", -1);
     }
 
     // Update is called once per frame
@@ -30,6 +33,8 @@ public class PlayerMovement : MonoBehaviour
         change.x = Input.GetAxisRaw("Horizontal");
         change.y = Input.GetAxisRaw("Vertical");
 
+
+        // path finding 우선.
         if (currentState != PlayerState.attack && Input.GetButtonDown("attack"))
         {
             StartCoroutine( AttackCo() );
@@ -61,7 +66,6 @@ public class PlayerMovement : MonoBehaviour
             animator.SetFloat("moveX", change.x);
             animator.SetFloat("moveY", change.y);
             animator.SetBool("moving", true);
-
         }
         else
         {
@@ -71,6 +75,7 @@ public class PlayerMovement : MonoBehaviour
 
     void MoveCharacter()
     {
+        change.Normalize();
         myRigidbody.MovePosition(transform.position + change * speed * Time.deltaTime);
     }
 }
