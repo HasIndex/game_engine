@@ -6,11 +6,11 @@ public delegate void PacketHandlerFunc(PacketHeader header, C2PayloadVector payl
 
 public class C2PacketHandler
 {
-    public static PacketHandlerFunc[] handlers = new PacketHandlerFunc[(Int32)PacketType.MAX];
+    public static PacketHandlerFunc[] handlers = new PacketHandlerFunc[(Int32)PacketType.PT_MAX];
 
     public C2PacketHandler()
     {
-        for(int n = 0; n < (int)PacketType.MAX; ++n)
+        for(int n = 0; n < (int)PacketType.PT_MAX; ++n)
         {
             handlers[n] = DoDefualutHandler;
         }
@@ -25,7 +25,7 @@ public class C2PacketHandler
     {
         get 
         {
-            if(PacketType.NONE < type && type < PacketType.MAX)
+            if(PacketType.PT_NONE < type && type < PacketType.PT_MAX)
                 return C2PacketHandler.handlers[(int)type];
             else
                 throw new IndexOutOfRangeException();
@@ -34,24 +34,23 @@ public class C2PacketHandler
 }
 
 
-public class InitialiPacketHandler : C2PacketHandler
+
+public class LoginPacketHandler : C2PacketHandler
 {
-    public InitialiPacketHandler() : base()
+    public LoginPacketHandler() : base()
     {
-        handlers[(Int32)PacketType.HI] = HiRequest;
+        handlers[(Int32)PacketType.S2C_LOGIN_OK] = HiRequest;
     }
 
     void HiRequest(PacketHeader header, C2PayloadVector payload, C2Session session)
     {
-        HiPacket hi = new HiPacket();
-        ByePacket bye = new ByePacket();
+        //HiPacket hi = new HiPacket();
+        //ByePacket bye = new ByePacket();
 
-        payload.Read<HiPacket>(out hi);
-        payload.Read<ByePacket>(out bye);
-
+        //payload.Read<HiPacket>(out hi);
+        //payload.Read<ByePacket>(out bye);
     }
-} 
-
+}
 
 
 

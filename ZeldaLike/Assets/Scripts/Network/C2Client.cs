@@ -1,16 +1,28 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using UnityEngine;
 
-
-public static class C2Client
+public class C2Client
 {
+    public C2Session        session;
+    public string          nickname { get; set; }
+    private MonoBehaviour   player;
 
-    public static C2Session session;
+    public C2Client(PlayerMovement playerMovement)
+    {
+        session = new C2Session(this);
+        player = playerMovement;
+    }
 
-    static C2Client() {}
+    public void Service()
+    {
+        session.Service(); // 
+    }
+
+    public void SendPakcet<T>(T packet)
+    {
+        session.SendPacket<T>(packet);
+    }
+
+
 
 }
