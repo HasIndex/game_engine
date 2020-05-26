@@ -17,6 +17,10 @@ public class PlayerMovement : MonoBehaviour
     private Vector3         change;
     private Animator        animator;
     private C2Client        client;
+
+    public int Level { get; set; } = 1;
+    public int Exp { get; set; } = 0;
+
     [SerializeField] private Stat hp;
     [SerializeField] private Stat mp;
 
@@ -32,17 +36,17 @@ public class PlayerMovement : MonoBehaviour
         animator.SetFloat("moveX", 0);
         animator.SetFloat("moveY", -1);
 
-        client = new C2Client(this);
+        //client = new C2Client(this);
     }
 
     // Update is called once per frame
     void Update()
     {
         //client.session.Update();
-        if (UIManager.Instance.CurrentState != UIState.Play)
-        {
-            return;
-        }
+        //if (UIManager.Instance.CurrentState != UIState.Play)
+        //{
+        //    return;
+        //}
 
 
         if (Input.GetKeyDown(KeyCode.I))

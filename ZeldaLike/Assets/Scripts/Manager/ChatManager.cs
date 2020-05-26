@@ -12,7 +12,7 @@ public class ChatManager : Singleton<ChatManager>
 
     void Start()
     {
-        
+        //scrollView.SetEnabled(false);
     }
 
     void Update()
