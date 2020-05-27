@@ -43,13 +43,14 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         //client.session.Update();
-        //if (UIManager.Instance.CurrentState != UIState.Play)
-        //{
-        //    return;
-        //}
+        if (UIManager.Instance.CurrentState != UIState.Play)
+        {
+            return;
+        }
 
 
-        if (Input.GetKeyDown(KeyCode.I))
+        // hp bar test
+        if (Input.GetKeyDown(KeyCode.I))        
         {
             hp.CurrentValue -= 10;
             mp.CurrentValue -= 10;
@@ -59,7 +60,6 @@ public class PlayerMovement : MonoBehaviour
             hp.CurrentValue += 10;
             mp.CurrentValue += 10;
         }
-
 
         change = Vector3.zero;
         change.x = Input.GetAxisRaw("Horizontal");
@@ -77,17 +77,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    //private void FixedUpdate()
-    //{
-    //    change = Vector3.zero;
-    //    change.x = Input.GetAxisRaw("Horizontal");
-    //    change.y = Input.GetAxisRaw("Vertical");
-
-    //    if (change != Vector3.zero)
-    //    {
-    //        MoveCharacter();
-    //    }
-    //}
 
 
     //void FixedUpdate()

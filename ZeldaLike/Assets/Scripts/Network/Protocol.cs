@@ -19,6 +19,14 @@ public enum PacketType : sbyte
 	PT_MAX,
 };
 
+public enum Protocol
+{
+	MAX_ID_LEN = 50,
+	MAX_CHAT_LEN = 100,
+	MAX_STR_LEN = 255
+}
+
+
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public unsafe struct PacketHeader
 {
@@ -32,7 +40,7 @@ public unsafe struct cs_packet_login
 {
     public PacketHeader header;
 
-    public fixed  sbyte name[50];
+    public fixed byte name[(int)Protocol.MAX_ID_LEN];
 };
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -40,8 +48,16 @@ public unsafe struct cs_packet_move
 {
 	public PacketHeader header;
 
-	public char			direction;
+	public sbyte		direction;
 	public UInt32		move_time;
+};
+
+public unsafe struct cs_packet_chat
+{
+	public PacketHeader header;
+
+	public	int			id;
+	public fixed byte	chat[(int)Protocol.MAX_CHAT_LEN];
 };
 
 
@@ -74,24 +90,26 @@ public unsafe struct sc_packet_enter
 	public PacketHeader header;
 
 	public int id;
-	public fixed sbyte name[10];
-	public char o_type;
+	public fixed byte name[(int)Protocol.MAX_ID_LEN];
+	public sbyte o_type;
 	public short x, y;
 };
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
 
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public unsafe struct sc_packet_leave
 {
 	public PacketHeader header;
 
 	public int id;
 };
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
 
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public unsafe struct sc_packet_chat
 {
 	public PacketHeader header;
 
 	public int id;
-	public fixed sbyte chat[100];
+	public fixed byte chat[(int)Protocol.MAX_CHAT_LEN];
 };
