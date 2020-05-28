@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -26,12 +27,17 @@ enum DisconnectReason
     DISCONNECTED,
 }
 
+public class Buffer2
+{
+    public byte[] buffer = new byte[1024];
+}
+
 
 public class C2Session //: MonoBehaviour
 {
     private Socket              socket      = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-    private C2PayloadVector     recvBuffer  = new C2PayloadVector();
     private C2PayloadVector     sendBuffer  = new C2PayloadVector();
+    private C2PayloadVector     recvBuffer  = new C2PayloadVector();
     private Int64               recvBytes;
     private Int64               sendBytes;
     private IAsyncResult        retAsync;
@@ -66,8 +72,8 @@ public class C2Session //: MonoBehaviour
 
             case SessionState.Connected:
             {
-                RecvPayload();
                 SendPayload();
+                RecvPayload();
                 break;
             }
             case SessionState.Disconecting:
@@ -91,7 +97,7 @@ public class C2Session //: MonoBehaviour
     private void OnInit()
     {
         socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
-        socket.Blocking = false;
+        socket.Blocking = true;
         socket.NoDelay = true;
 
         this.state = SessionState.Initialized;
@@ -141,79 +147,94 @@ public class C2Session //: MonoBehaviour
             return;
         }
 
-        int sentBytes = socket.Send(sendBuffer.GetBuffer(), sendBuffer.ReadHead, sendBuffer.Size, SocketFlags.None);
-        sendBuffer.MoveReadHead(sentBytes);
-        sendBuffer.Rewind();
-        Debug.Log($"Sent bytes = { sentBytes } bytes");
+        //Social,
+
+        if (true == socket.Poll(0, SelectMode.SelectWrite)) // 데이터를 읽을 수 있다면 ...
+        {
+            int sentBytes = socket.Send(sendBuffer.GetBuffer(), sendBuffer.ReadHead, sendBuffer.Size, SocketFlags.None);
+            sendBuffer.MoveReadHead(sentBytes);
+            sendBuffer.Rewind();
+            Debug.Log($"Sent bytes = { sentBytes } bytes");
+        }
     }
+
+    
 
     public void RecvPayload()
     {
-        if (true == socket.Poll(0, SelectMode.SelectRead) ) // 데이터를 읽을 수 있다면 ...
+        if (true == socket.Poll(0, SelectMode.SelectRead)) // 데이터를 읽을 수 있다면 ...
         {
-            SocketError error;
-            Int32 receivedBytes = socket.Receive(recvBuffer.GetBuffer(), recvBuffer.WriteHead, recvBuffer.FreeSize, SocketFlags.None, out error);
-            if(0 < receivedBytes)
+            Int32 receivedBytes = socket.Receive(recvBuffer.GetBuffer(), 0, 1024, SocketFlags.None);
+            //Int32 receivedBytes = socket.Receive(recvBuffer.GetBuffer(), recvBuffer.WriteHead, recvBuffer.FreeSize, SocketFlags.None, out error);
+            if (0 < receivedBytes)
             {
+                //Debug.Log($"recv bytes = { receivedBytes } bytes");
+                
                 recvBuffer.MoveWriteHead(receivedBytes);
-
+                
                 OnRecv();
+            }
+            else
+            {
+                //recvBytes 
             }
         }
     }
 
     public void OnRecv()
     {
-        PacketHeader header = default;
+        PacketHeader header;
         Int32 headerSize = Marshal.SizeOf<PacketHeader>();
-        Int32 readBytes = 0;
+        //Int32 readBytes = 0;
 
-        for (;;)
+        for ( ; ; )
         {
-            if ( headerSize != recvBuffer.Peek<PacketHeader>(out header, headerSize) )
+            Debug.Log(recvBuffer.Size);
+
+            if (headerSize != recvBuffer.Peek(out header, headerSize))
                 break;
 
-            if(header.size > recvBuffer.Size)
+            if (header.size > recvBuffer.Size)
                 break;
 
             // 범위 체크..
             handler[header.type](header, this.recvBuffer, this);
 
-            recvBuffer.MoveReadHead(readBytes);
+            //recveBuffer.MoveReadHead(header.size);
         }
 
         recvBuffer.Rewind();
     }
 
-    public void ParsePacket(PacketHeader header)
-    {
-        switch (header.type)
-        {
-            case PacketType.S2C_LOGIN_OK:
-            {
-                sc_packet_login_ok loginPayload;
-                break;
-            }
+    //public void ParsePacket(PacketHeader header)
+    //{
+    //    switch (header.type)
+    //    {
+    //        case PacketType.S2C_LOGIN_OK:
+    //        {
+    //            sc_packet_login_ok loginPayload;
+    //            break;
+    //        }
 
-            case PacketType.S2C_MOVE:
-            {
-                sc_packet_enter movePayload;
-                break;
-            }
+    //        case PacketType.S2C_MOVE:
+    //        {
+    //            sc_packet_enter movePayload;
+    //            break;
+    //        }
 
-            case PacketType.S2C_ENTER:
-            {
-                sc_packet_enter enterPayload;
-                break;
-            }
+    //        case PacketType.S2C_ENTER:
+    //        {
+    //            sc_packet_enter enterPayload;
+    //            break;
+    //        }
 
-            case PacketType.S2C_LEAVE:
-            {
-                sc_packet_enter leavePayload;
-                break;
-            }
-        }
-    }
+    //        case PacketType.S2C_LEAVE:
+    //        {
+    //            sc_packet_enter leavePayload;
+    //            break;
+    //        }
+    //    }
+    //}
 
     public static void OnConnectComplete(IAsyncResult ar)
     {

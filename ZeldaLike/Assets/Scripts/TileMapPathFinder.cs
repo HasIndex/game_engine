@@ -104,7 +104,7 @@ public class TileMapPathFinder : MonoBehaviour
                 RaycastHit2D hit = Physics2D.Raycast(tiles[y, x].position, Vector2.zero, 0f);
                 if (hit.collider != null)
                 {
-                    Debug.Log($" {hit.collider.name}: parent : {transform.parent.name},  tiles[{y}, {x}] obstacle position y: { tiles[y, x].position.y}, x:{tiles[y, x].position.x }");
+                    //Debug.Log($" {hit.collider.name}: parent : {transform.parent.name},  tiles[{y}, {x}] obstacle position y: { tiles[y, x].position.y}, x:{tiles[y, x].position.x }");
                     tiles[y, x].has_obstacle = true;
                 }
                 else

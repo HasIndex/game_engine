@@ -21,10 +21,10 @@ public class NetworkManager : Singleton<NetworkManager>
 
     void Start()
     {
+        Debug.Log("Network Manager");
         LoadConfigUsingJson();
         client = new C2Client(player);
     }
-
 
     private void Update()
     {

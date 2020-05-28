@@ -35,8 +35,6 @@ public class PlayerMovement : MonoBehaviour
 
         animator.SetFloat("moveX", 0);
         animator.SetFloat("moveY", -1);
-
-        //client = new C2Client(this);
     }
 
     // Update is called once per frame

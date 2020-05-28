@@ -9,8 +9,8 @@ public class C2PayloadVector
         MAXIMUM_SEGMENT_SIZE = 1460 // 
     }
 
-    private byte[] buffer = new byte[64 * 1024];
-    private Int32 writeHead = 0;
+    byte[] buffer = new byte[64 * 1024];
+    public Int32 writeHead = 0;
     private Int32 readHead = 0;
 
     // For geneic method..

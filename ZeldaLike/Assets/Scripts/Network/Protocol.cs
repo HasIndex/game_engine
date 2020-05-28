@@ -10,11 +10,13 @@ public enum PacketType : sbyte
 
 	C2S_LOGIN = 1,
 	C2S_MOVE,
+	C2S_CHAT,
 
 	S2C_LOGIN_OK = 1,
 	S2C_MOVE,
 	S2C_ENTER,
 	S2C_LEAVE,
+	S2C_CHAT,
 
 	PT_MAX,
 };
@@ -63,7 +65,7 @@ public unsafe struct cs_packet_chat
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 
-public unsafe struct sc_packet_login_ok
+public unsafe struct sc_packet_login_ok // 16
 {
 	public PacketHeader header;
 
@@ -85,7 +87,7 @@ public unsafe struct sc_packet_move
 };
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 
-public unsafe struct sc_packet_enter
+public unsafe struct sc_packet_enter // 
 {
 	public PacketHeader header;
 
