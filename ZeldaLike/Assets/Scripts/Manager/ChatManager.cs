@@ -4,16 +4,41 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
+
+public enum MessageType
+{
+    System, User, Global, Friend, Party, Guild
+}
+
+
+[System.Serializable]
+public class Message
+{
+    public string text;
+    public Text textObject;
+    public MessageType type;
+}
+
+
+
 public class ChatManager : Singleton<ChatManager>
 {
+    private int maxChatMessage = 25;
+
     [SerializeField] Text       instance;
     [SerializeField] InputField inputField;
-    [SerializeField] ScrollView scrollView;
+    public GameObject           chatPannel;
+    public GameObject           textObject;
+    [SerializeField] Color user, system; 
+
+    [SerializeField] List<Message> chatRecords ;
+
 
     void Start()
     {
-        //scrollView.SetEnabled(false);
+        chatRecords = new List<Message>();
     }
+
 
     void Update()
     {
@@ -30,18 +55,67 @@ public class ChatManager : Singleton<ChatManager>
 
                 break;
             }
-            case UIState.Chat:
+            case UIState.Chat: 
             {
-                if (Input.GetKeyDown(KeyCode.Return) && inputField.text != string.Empty)
+                if (Input.GetKeyDown(KeyCode.Return) )
                 {
-                    Debug.Log(inputField.text);
+                    if (inputField.text != string.Empty) // 내 채팅 입력 
+                    {
+                        AddChat(inputField.text, MessageType.User);
+                    }
 
                     inputField.text = string.Empty;
-
                     UIManager.Instance.CurrentState = UIState.Play;
                 }
                 break;
             }
         }
     }
+
+
+    public void AddChat(string text, MessageType type)
+    {
+        if (chatRecords.Count >= maxChatMessage)
+        {
+            Destroy(chatRecords[0].textObject.gameObject);
+            chatRecords.Remove(chatRecords[0]);
+        }
+
+        Message newMessage = new Message();
+
+        newMessage.text = text;
+
+        GameObject newText = Instantiate(textObject, chatPannel.transform);
+
+        newMessage.textObject = newText.GetComponent<Text>();
+
+        newMessage.textObject.text = newMessage.text;
+        newMessage.textObject.color = MessageTypeColor(type);
+
+        chatRecords.Add(newMessage);
+    }
+
+    Color MessageTypeColor(MessageType type)
+    {
+        Color color;
+
+        switch (type)
+        {
+            case MessageType.System:
+                color = this.system;
+                break;
+
+            case MessageType.User:
+                color = this.user;
+                break;
+
+            default:
+                color = this.system;
+                break;
+        }
+
+        return color;
+    }
+
 }
+
