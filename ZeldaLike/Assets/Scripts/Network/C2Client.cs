@@ -1,28 +1,50 @@
 ﻿using System;
 using UnityEngine;
 
-public class C2Client
+public class C2Client : Singleton<C2Client>
 {
-    public C2Session        session;
-    public string          nickname { get; set; }
-    private MonoBehaviour   player;
+    public C2Session session;
+    public string nickname = "default";
+    [SerializeField] PlayerMovement player;
 
     public C2Client(PlayerMovement playerMovement)
     {
-        session = new C2Session(this);
+        session = C2Session.Instance;
+        session.Client = this;
         player = playerMovement;
     }
 
-    public void Service()
+    public void Start()
     {
-        session.Service(); // 
+        if (session == null)
+        {
+            session = C2Session.Instance;
+            session.Client = this;
+        }
+
+
+        nickname = "default";
     }
+
+    private void Update()
+    {
+    }
+
 
     public void SendPakcet<T>(T packet)
     {
         session.SendPacket<T>(packet);
     }
 
-
-
+    public PlayerMovement Player
+    {
+        get
+        {
+            return player;
+        }
+        set
+        {
+            player = value;
+        }
+    }
 }

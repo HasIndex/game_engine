@@ -27,25 +27,33 @@ enum DisconnectReason
     DISCONNECTED,
 }
 
-public class Buffer2
-{
-    public byte[] buffer = new byte[1024];
-}
 
 
-public class C2Session //: MonoBehaviour
+public class C2Session : Singleton<C2Session>
 {
-    private Socket              socket      = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-    private C2PayloadVector     sendBuffer  = new C2PayloadVector();
-    private C2PayloadVector     recvBuffer  = new C2PayloadVector();
+    private Socket              socket;
+    private C2PayloadVector     sendBuffer;
+    private C2PayloadVector     recvBuffer;
     private Int64               recvBytes;
     private Int64               sendBytes;
     private IAsyncResult        retAsync;
     private SessionState        state       = SessionState.Uninitialized;
-    private Int64               uniqueSessionId;
+    public Int64               uniqueSessionId { get; set; }
     private Int32               reconnectCount;
-    private C2PacketHandler     handler     = new InitialiPacketHandler();
-    private C2Client            client;
+    private C2PacketHandler     handler;     
+    [SerializeField] C2Client   client;
+
+    public C2Client Client 
+    { 
+        get
+        {
+            return client;
+        }
+        set
+        {
+            client = value;
+        }
+    }
 
 
     public C2Session(C2Client client)
@@ -55,7 +63,12 @@ public class C2Session //: MonoBehaviour
     }
 
 
-    public void Service()
+    public void Start()
+    {
+        OnInit();
+    }
+
+    public void Update()
     {
         switch (state)
         {
@@ -94,8 +107,12 @@ public class C2Session //: MonoBehaviour
         sendBuffer.Wirte<T>(packet);
     }
 
-    private void OnInit()
+    public void OnInit()
     {
+        socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        sendBuffer = new C2PayloadVector();
+        recvBuffer = new C2PayloadVector();
+        handler     = new InitialiPacketHandler();
         socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.DontLinger, true);
         socket.Blocking = true;
         socket.NoDelay = true;
@@ -154,7 +171,8 @@ public class C2Session //: MonoBehaviour
             int sentBytes = socket.Send(sendBuffer.GetBuffer(), sendBuffer.ReadHead, sendBuffer.Size, SocketFlags.None);
             sendBuffer.MoveReadHead(sentBytes);
             sendBuffer.Rewind();
-            Debug.Log($"Sent bytes = { sentBytes } bytes");
+
+            Debug.Log($" send : { sentBytes}");
         }
     }
 
@@ -164,7 +182,7 @@ public class C2Session //: MonoBehaviour
     {
         if (true == socket.Poll(0, SelectMode.SelectRead)) // 데이터를 읽을 수 있다면 ...
         {
-            Int32 receivedBytes = socket.Receive(recvBuffer.GetBuffer(), 0, 1024, SocketFlags.None);
+            Int32 receivedBytes = socket.Receive(recvBuffer.GetBuffer(), 0, recvBuffer.FreeSize, SocketFlags.None);
             //Int32 receivedBytes = socket.Receive(recvBuffer.GetBuffer(), recvBuffer.WriteHead, recvBuffer.FreeSize, SocketFlags.None, out error);
             if (0 < receivedBytes)
             {
@@ -173,31 +191,33 @@ public class C2Session //: MonoBehaviour
                 recvBuffer.MoveWriteHead(receivedBytes);
                 
                 OnRecv();
+
+                Debug.Log($" recv : { receivedBytes }");
             }
-            else
+            else if (receivedBytes == 0)
             {
-                //recvBytes 
+                Debug.LogError($"recv bytes = { receivedBytes } bytes");
             }
         }
     }
 
+
+    int headerSize = Marshal.SizeOf<PacketHeader>();
     public void OnRecv()
     {
         PacketHeader header;
-        Int32 headerSize = Marshal.SizeOf<PacketHeader>();
-        //Int32 readBytes = 0;
 
         for ( ; ; )
         {
-            Debug.Log(recvBuffer.Size);
-
-            if (headerSize != recvBuffer.Peek(out header, headerSize))
+            if (2 != recvBuffer.Peek(out header, 2))
                 break;
 
             if (header.size > recvBuffer.Size)
                 break;
 
             // 범위 체크..
+            Debug.Log($"{header.type} : {(int)header.type}, packet size : { header.size} ");
+
             handler[header.type](header, this.recvBuffer, this);
 
             //recveBuffer.MoveReadHead(header.size);
@@ -206,37 +226,7 @@ public class C2Session //: MonoBehaviour
         recvBuffer.Rewind();
     }
 
-    //public void ParsePacket(PacketHeader header)
-    //{
-    //    switch (header.type)
-    //    {
-    //        case PacketType.S2C_LOGIN_OK:
-    //        {
-    //            sc_packet_login_ok loginPayload;
-    //            break;
-    //        }
-
-    //        case PacketType.S2C_MOVE:
-    //        {
-    //            sc_packet_enter movePayload;
-    //            break;
-    //        }
-
-    //        case PacketType.S2C_ENTER:
-    //        {
-    //            sc_packet_enter enterPayload;
-    //            break;
-    //        }
-
-    //        case PacketType.S2C_LEAVE:
-    //        {
-    //            sc_packet_enter leavePayload;
-    //            break;
-    //        }
-    //    }
-    //}
-
-    public static void OnConnectComplete(IAsyncResult ar)
+    public static unsafe void OnConnectComplete(IAsyncResult ar)
     {
         C2Session session = (C2Session)ar.AsyncState;
 
@@ -250,9 +240,11 @@ public class C2Session //: MonoBehaviour
             cs_packet_login loginPacket;
             loginPacket.header.type = PacketType.C2S_LOGIN;
             loginPacket.header.size = (sbyte)Marshal.SizeOf(typeof(cs_packet_login));
-            //byte[] utf16Bytes = Encoding.UTF8.GetBytes(session.client.nickname);
-            //Marshal.Copy(utf16Bytes, loginPacket.name, , 50);
 
+            
+            byte[] utf8byte = System.Text.Encoding.UTF8.GetBytes(C2Client.Instance.nickname);
+            int a = utf8byte.Length > 50 ? 50 : utf8byte.Length;
+            Marshal.Copy(utf8byte, 0, (IntPtr)loginPacket.name, a);
             session.SendPacket(loginPacket);
         }
         else

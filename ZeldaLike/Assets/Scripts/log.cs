@@ -8,6 +8,8 @@ public class log : Enemy
     public float        chaseRadius;
     public float        attackRadius;
     public Transform    homePosition;
+
+
     void Start()
     {
         target = GameObject.FindWithTag("Player").transform;

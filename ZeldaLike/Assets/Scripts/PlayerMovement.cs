@@ -2,7 +2,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
 
 public enum PlayerState
 {
@@ -42,13 +43,11 @@ public class PlayerMovement : MonoBehaviour
     {
         //client.session.Update();
         if (UIManager.Instance.CurrentState != UIState.Play)
-        {
             return;
-        }
 
 
         // hp bar test
-        if (Input.GetKeyDown(KeyCode.I))        
+        if (Input.GetKeyDown(KeyCode.I))
         {
             hp.CurrentValue -= 10;
             mp.CurrentValue -= 10;
@@ -60,8 +59,23 @@ public class PlayerMovement : MonoBehaviour
         }
 
         change = Vector3.zero;
-        change.x = Input.GetAxisRaw("Horizontal");
-        change.y = Input.GetAxisRaw("Vertical");
+        if(Input.GetKeyDown(KeyCode.UpArrow) == true)
+        {
+            change.y = +0.8f;
+        }
+        else if(Input.GetKeyDown(KeyCode.DownArrow) == true)
+        {
+            change.y = -0.8f;
+        }
+        if (Input.GetKeyDown(KeyCode.LeftArrow) == true)
+        {
+            change.x = -.8f;
+        }
+        else if (Input.GetKeyDown(KeyCode.RightArrow) == true)
+        {
+            change.x = +.8f;
+        }
+
 
 
         // path finding 우선.
@@ -75,25 +89,6 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-
-
-    //void FixedUpdate()
-    //{
-    //    change = Vector3.zero;
-    //    change.x = Input.GetAxisRaw("Horizontal");
-    //    change.y = Input.GetAxisRaw("Vertical");
-
-
-    //    // path finding 우선.
-    //    if (currentState != PlayerState.attack && Input.GetButtonDown("attack"))
-    //    {
-    //        StartCoroutine(AttackCo());
-    //    }
-    //    else if (currentState == PlayerState.walk)
-    //    {
-    //        UpdateAnimatorAndMove();
-    //    }
-    //}
 
 
     private IEnumerator AttackCo()
@@ -126,7 +121,16 @@ public class PlayerMovement : MonoBehaviour
 
     void MoveCharacter()
     {
-        change.Normalize();
-        myRigidbody.MovePosition(transform.position + change * ( speed * Time.fixedDeltaTime));
+        //change.Normalize();
+        myRigidbody.MovePosition(transform.position + change);
+    }
+
+    public void MoveCharacterUsingServerPostion(int y, int x)
+    {
+        Vector3 vector = new Vector3();
+        vector.x = x;
+        vector.y = y;
+        Debug.Log($"move server postion x {x}, y {y}");
+        myRigidbody.MovePosition(vector);
     }
 }

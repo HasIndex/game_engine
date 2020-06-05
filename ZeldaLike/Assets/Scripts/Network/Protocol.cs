@@ -8,23 +8,23 @@ public enum PacketType : sbyte
 {
 	PT_NONE,
 
-	C2S_LOGIN = 1,
-	C2S_MOVE,
-	C2S_CHAT,
-
 	S2C_LOGIN_OK = 1,
 	S2C_MOVE,
 	S2C_ENTER,
 	S2C_LEAVE,
 	S2C_CHAT,
-
 	PT_MAX,
+
+	C2S_LOGIN = 1,
+	C2S_MOVE,
+	C2S_CHAT,
 };
 
 public enum Protocol
 {
+	HEADER_SIZE = 2,
 	MAX_ID_LEN = 50,
-	MAX_CHAT_LEN = 100,
+	MAX_CHAT_LEN = 50,
 	MAX_STR_LEN = 255
 }
 
@@ -54,6 +54,8 @@ public unsafe struct cs_packet_move
 	public UInt32		move_time;
 };
 
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public unsafe struct cs_packet_chat
 {
 	public PacketHeader header;
@@ -85,8 +87,11 @@ public unsafe struct sc_packet_move
 	public short x, y;
 	public UInt32 move_time;
 };
-[StructLayout(LayoutKind.Sequential, Pack = 1)]
 
+
+
+
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public unsafe struct sc_packet_enter // 
 {
 	public PacketHeader header;

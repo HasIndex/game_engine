@@ -4,17 +4,19 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using UnityEngine;
 
 
 public class InitialiPacketHandler : C2PacketHandler
 {
     public InitialiPacketHandler() : base()
     {
-        handlers[(Int32)PacketType.S2C_ENTER] = Enter;
         handlers[(Int32)PacketType.S2C_LOGIN_OK] = LoginOk;
-        handlers[(Int32)PacketType.S2C_LEAVE] = Leave;
         handlers[(Int32)PacketType.S2C_MOVE] = Move;
+        handlers[(Int32)PacketType.S2C_ENTER] = Enter;
+        handlers[(Int32)PacketType.S2C_LEAVE] = Leave;
         handlers[(Int32)PacketType.S2C_CHAT] = Chat;
+
     }
 
     private void Chat(PacketHeader header, C2PayloadVector payload, C2Session session)
@@ -27,24 +29,28 @@ public class InitialiPacketHandler : C2PacketHandler
     }
 
 
-    /// <summary>
-    ///  this clinet to sserver
-    /// </summary>
-    void Enter(PacketHeader header, C2PayloadVector payload, C2Session session)
-    {
-        sc_packet_enter enterPayload;
-
-        payload.Read(out enterPayload);
-    }
-
-    // 회원가입
+       // 회원가입
     void LoginOk(PacketHeader header, C2PayloadVector payload, C2Session session)
     {
         sc_packet_login_ok loginOkPayload;
-        
+
         payload.Read(out loginOkPayload);
+
+        C2Session.Instance.uniqueSessionId = (Int64)loginOkPayload.id;
+        C2Client.Instance.Player.MoveCharacterUsingServerPostion(loginOkPayload.y, loginOkPayload.x);
     }
 
+
+    void Enter(PacketHeader header, C2PayloadVector payload, C2Session session)
+    {
+        sc_packet_enter enterPayload;
+        payload.Read(out enterPayload);
+
+
+        
+    }
+
+ 
     // 이동
     void Move(PacketHeader header, C2PayloadVector payload, C2Session session)
     {

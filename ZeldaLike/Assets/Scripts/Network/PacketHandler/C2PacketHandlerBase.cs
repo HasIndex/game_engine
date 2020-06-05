@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 
 public delegate void PacketHandlerFunc(PacketHeader header, C2PayloadVector payload, C2Session session);
