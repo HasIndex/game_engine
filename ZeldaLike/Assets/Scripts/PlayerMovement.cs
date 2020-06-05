@@ -22,13 +22,15 @@ public class PlayerMovement : MonoBehaviour
     public int Level { get; set; } = 1;
     public int Exp { get; set; } = 0;
 
-    [SerializeField] private Stat hp;
-    [SerializeField] private Stat mp;
+    [SerializeField] private Stat       hp;
+    [SerializeField] private Stat       mp;
+    [SerializeField] private Portrait   portrait;
 
     void Start()
     {
         hp.Initialize(200, 200);
         mp.Initialize(200, 200);
+        portrait.SetLevel(5); 
 
         currentState    = PlayerState.walk;
         animator        = GetComponent<Animator>();
@@ -41,22 +43,21 @@ public class PlayerMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //client.session.Update();
         if (UIManager.Instance.CurrentState != UIState.Play)
             return;
 
+        //// hp bar test
+        //if (Input.GetKeyDown(KeyCode.I))
+        //{
+        //    hp.CurrentValue -= 10;
+        //    mp.CurrentValue -= 10;
+        //}
+        //if (Input.GetKeyDown(KeyCode.O))
+        //{
+        //    hp.CurrentValue += 10;
+        //    mp.CurrentValue += 10;
+        //}
 
-        // hp bar test
-        if (Input.GetKeyDown(KeyCode.I))
-        {
-            hp.CurrentValue -= 10;
-            mp.CurrentValue -= 10;
-        }
-        if (Input.GetKeyDown(KeyCode.O))
-        {
-            hp.CurrentValue += 10;
-            mp.CurrentValue += 10;
-        }
 
         change = Vector3.zero;
         if(Input.GetKeyDown(KeyCode.UpArrow) == true)
@@ -119,6 +120,11 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public void ParseLoginPacket( sc_packet_login_ok payload )
+    {
+
+    }
+
     void MoveCharacter()
     {
         //change.Normalize();
@@ -132,5 +138,15 @@ public class PlayerMovement : MonoBehaviour
         vector.y = y;
         Debug.Log($"move server postion x {x}, y {y}");
         myRigidbody.MovePosition(vector);
+    }
+
+    public void SetHP(int minHp, int maxHp)
+    {
+        hp.Initialize(minHp, maxHp);
+    }
+
+    public void SetLevel(int level)
+    {
+        //portrait.
     }
 }

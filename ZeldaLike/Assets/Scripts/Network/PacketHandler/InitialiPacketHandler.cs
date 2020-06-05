@@ -16,7 +16,6 @@ public class InitialiPacketHandler : C2PacketHandler
         handlers[(Int32)PacketType.S2C_ENTER] = Enter;
         handlers[(Int32)PacketType.S2C_LEAVE] = Leave;
         handlers[(Int32)PacketType.S2C_CHAT] = Chat;
-
     }
 
     private void Chat(PacketHeader header, C2PayloadVector payload, C2Session session)
@@ -29,7 +28,7 @@ public class InitialiPacketHandler : C2PacketHandler
     }
 
 
-       // 회원가입
+    // 로그인 확인.
     void LoginOk(PacketHeader header, C2PayloadVector payload, C2Session session)
     {
         sc_packet_login_ok loginOkPayload;
@@ -37,7 +36,11 @@ public class InitialiPacketHandler : C2PacketHandler
         payload.Read(out loginOkPayload);
 
         C2Session.Instance.uniqueSessionId = (Int64)loginOkPayload.id;
+
         C2Client.Instance.Player.MoveCharacterUsingServerPostion(loginOkPayload.y, loginOkPayload.x);
+        C2Client.Instance.Player.Level = loginOkPayload.level;
+        C2Client.Instance.Player.SetHP(loginOkPayload.hp, loginOkPayload.level * 2);
+        C2Client.Instance.Player.Exp = loginOkPayload.exp;
     }
 
 
