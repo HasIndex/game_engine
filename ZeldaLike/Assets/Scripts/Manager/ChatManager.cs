@@ -7,7 +7,7 @@ using UnityEngine.UIElements;
 
 public enum MessageType
 {
-    System, User, Global, Friend, Party, Guild
+    System, User, Global, Friend, Party
 }
 
 

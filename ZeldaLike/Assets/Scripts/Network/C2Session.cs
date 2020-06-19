@@ -63,12 +63,12 @@ public class C2Session : Singleton<C2Session>
     }
 
 
-    public void Start()
+    void Awake()
     {
         OnInit();
     }
 
-    public void Update()
+    void Update()
     {
         switch (state)
         {

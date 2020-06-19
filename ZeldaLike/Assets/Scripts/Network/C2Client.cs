@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class C2Client : Singleton<C2Client>
@@ -28,6 +29,28 @@ public class C2Client : Singleton<C2Client>
 
     private void Update()
     {
+    }
+
+    public void SendMovePakcet(PlayerMovement player)
+    {
+        cs_packet_move movePayload;//
+        movePayload.header.size = (sbyte)Marshal.SizeOf<PacketHeader>();
+        movePayload.header.type = PacketType.C2S_MOVE;
+        movePayload.move_time = 0;
+        movePayload.direction = player.Direction ;// player.direction;
+
+        session.SendPacket<cs_packet_move>(movePayload);
+    }
+
+    public void SendAttackPakcet(PlayerMovement player)
+    {
+        //cs_packet_move movePayload;//
+        //movePayload.header.size = (sbyte)Marshal.SizeOf<PacketHeader>();
+        //movePayload.header.type = PacketType.C2S_MOVE;
+        //movePayload.move_time = 0;
+        //movePayload.direction = player.Direction;// player.direction;
+
+        //session.SendPacket<cs_packet_move>(movePayload);
     }
 
 

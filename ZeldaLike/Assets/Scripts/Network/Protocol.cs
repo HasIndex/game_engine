@@ -83,13 +83,10 @@ public unsafe struct sc_packet_move
 {
 	public PacketHeader header;
 
-	public int id;
+	public Int32 id;
 	public short x, y;
 	public UInt32 move_time;
 };
-
-
-
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public unsafe struct sc_packet_enter // 

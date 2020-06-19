@@ -20,7 +20,8 @@ public class NetworkManager : Singleton<NetworkManager>
 
 
     [SerializeField] PlayerMovement player;
-    void Start()
+
+    void Awake()
     {
         LoadConfigUsingJson();
         //client = new C2Client(player);
