@@ -18,9 +18,8 @@ public class NetworkManager : Singleton<NetworkManager>
     internal C2Client                   client;
     public static Int64                 uniqueSessionID = -1;
 
-
     [SerializeField] PlayerMovement player;
-
+    
     void Awake()
     {
         LoadConfigUsingJson();

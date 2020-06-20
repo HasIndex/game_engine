@@ -36,29 +36,23 @@ public class C2PacketHandler
 
 
 
-public class LoginPacketHandler : C2PacketHandler
-{
-    public LoginPacketHandler() : base()
-    {
-        handlers[(Int32)PacketType.S2C_LOGIN_OK] = HiRequest;
-    }
+//public class LoginPacketHandler : C2PacketHandler
+//{
+//    public LoginPacketHandler() : base()
+//    {
+//        handlers[(Int32)PacketType.S2C_LOGIN_OK] = HiRequest;
+//    }
 
-    void HiRequest(PacketHeader header, C2PayloadVector payload, C2Session session)
-    {
-        //HiPacket hi = new HiPacket();
-        //ByePacket bye = new ByePacket();
+//    void HiRequest(PacketHeader header, C2PayloadVector payload, C2Session session)
+//    {
+//        //HiPacket hi = new HiPacket();
+//        //ByePacket bye = new ByePacket();
 
-        //payload.Read<HiPacket>(out hi);
-        //payload.Read<ByePacket>(out bye);
-    }
-}
-
-
+//        //payload.Read<HiPacket>(out hi);
+//        //payload.Read<ByePacket>(out bye);
+//    }
+//}
 
 
-public class InGamePacketHandler : C2PacketHandler
-{
-    public InGamePacketHandler() : base()
-    {
-    }
-}
+
+
