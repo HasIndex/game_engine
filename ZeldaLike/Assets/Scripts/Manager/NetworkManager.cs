@@ -22,10 +22,11 @@ public class NetworkManager : Singleton<NetworkManager>
     
     void Awake()
     {
+        DontDestroyOnLoad(this.gameObject);
         LoadConfigUsingJson();
         //client = new C2Client(player);
         client = C2Client.Instance;
-        client.Player = player;
+        //client.Player = C2Client.;
         //(player);
     }
 

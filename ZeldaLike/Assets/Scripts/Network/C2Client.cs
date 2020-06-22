@@ -49,7 +49,6 @@ public class C2Client : Singleton<C2Client>
         //movePayload.header.type = PacketType.C2S_MOVE;
         //movePayload.move_time = 0;
         //movePayload.direction = player.Direction;// player.direction;
-
         //session.SendPacket<cs_packet_move>(movePayload);
     }
 
